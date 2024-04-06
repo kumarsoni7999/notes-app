@@ -1,4 +1,4 @@
-import { View, Text, FlatList, TouchableOpacity } from 'react-native'
+import { View, Text, FlatList, TouchableOpacity, ImageBackground } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import Card from '../../components/Card'
 import Details from '../../components/Details'
@@ -34,6 +34,7 @@ const Index = (props: any) => {
 
     const [notes, setNotes] = useState(null)
     const [tabs, setTabs] = useState(0)
+    const [refresh, setRefresh] = useState(false)
     const [selectedData, setSelectedData] = useState<any>({})
 
     const renderItem = ({ item }: any) => (
@@ -43,7 +44,7 @@ const Index = (props: any) => {
                 setTabs(1)
             }
         }>
-            <Card item={item} />
+            <Card item={item} setRefresh={setRefresh} refresh={refresh} />
         </TouchableOpacity>
     )
 
@@ -66,7 +67,7 @@ const Index = (props: any) => {
         if (tabs == 0) {
             note()
         }
-    }, [tabs])
+    }, [tabs, refresh])
 
     const handleClick = async () => {
         let obj = {
@@ -85,7 +86,7 @@ const Index = (props: any) => {
             let checkExist = Object.values(data).filter((item: any) => !item.title && !item.description)
             if (checkExist.length > 0) {
                 setSelectedData(checkExist[0])
-            }else{
+            } else {
                 data[obj.id] = obj
                 AsyncStorage.setItem('notes', JSON.stringify(data))
             }
@@ -94,19 +95,53 @@ const Index = (props: any) => {
     }
 
     return (
-        <View style={{
-            backgroundColor: '#303134',
-            flex: 1,
-            padding: 10
-        }}>
-            {tabs == 0 && (
-                <View style={{
-                    flex: 1
-                }}>
-                    {notes && Object.values(notes).length > 0 ? <FlatList
-                        data={Object.values(notes)}
-                        renderItem={renderItem}
-                        ListEmptyComponent={
+        <ImageBackground
+            source={require('../../assets/bg.jpg')}
+            style={{
+                flex: 1
+            }}
+            resizeMode="cover">
+            <View style={{
+                flex: 1,
+                padding: 10
+            }}>
+                {tabs == 0 && (
+                    <View style={{
+                        flex: 1
+                    }}>
+                        <View style={{
+                            paddingBottom: 30
+                        }}>
+                            <Text style={{
+                                color: 'white',
+                                fontSize: 24
+                            }}>
+                                Hii Rahul Soni
+                            </Text>
+                            <Text style={{
+                                color: 'white',
+                                fontSize: 14
+                            }}>
+                                here are your notes
+                            </Text>
+                        </View>
+                        {notes && Object.values(notes).length > 0 ? <FlatList
+                            data={Object.values(notes)}
+                            renderItem={renderItem}
+                            ListEmptyComponent={
+                                <View style={{
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    paddingTop: '100%'
+                                }}>
+                                    <Text style={{
+                                        color: 'white'
+                                    }}>
+                                        No data
+                                    </Text>
+                                </View>
+                            }
+                        /> : (
                             <View style={{
                                 justifyContent: 'center',
                                 alignItems: 'center',
@@ -115,46 +150,34 @@ const Index = (props: any) => {
                                 <Text style={{
                                     color: 'white'
                                 }}>
-                                    No data
+                                    No notes
                                 </Text>
                             </View>
-                        }
-                    /> : (
-                        <View style={{
+                        )}
+                        <TouchableOpacity style={{
+                            backgroundColor: '#0099ff',
+                            borderRadius: 100,
+                            width: 50,
+                            height: 50,
                             justifyContent: 'center',
                             alignItems: 'center',
-                            paddingTop: '100%'
-                        }}>
+                            position: 'absolute',
+                            bottom: 10,
+                            right: 10
+                        }} onPress={handleClick}>
                             <Text style={{
-                                color: 'white'
+                                color: 'white',
+                                fontSize: 30
                             }}>
-                                No notes
+                                +
                             </Text>
-                        </View>
-                    )}
-                    <TouchableOpacity style={{
-                        backgroundColor: '#0099ff',
-                        borderRadius: 100,
-                        width: 50,
-                        height: 50,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        position: 'absolute',
-                        bottom: 10,
-                        right: 10
-                    }} onPress={handleClick}>
-                        <Text style={{
-                            color: 'white',
-                            fontSize: 30
-                        }}>
-                            +
-                        </Text>
-                    </TouchableOpacity>
-                </View>
-            )}
+                        </TouchableOpacity>
+                    </View>
+                )}
 
-            {tabs == 1 && <Details item={selectedData} setTabs={setTabs} />}
-        </View>
+                {tabs == 1 && <Details item={selectedData} setTabs={setTabs} />}
+            </View>
+        </ImageBackground>
     )
 }
 

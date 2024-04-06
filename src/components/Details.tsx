@@ -1,8 +1,10 @@
-import { View, Text, TextInput, TouchableOpacity, ScrollView } from 'react-native'
+import { View, Text, TextInput, TouchableOpacity, ScrollView, ImageBackground } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { notes } from '../assets/properties'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { getNotesFromAsync } from '../screen/main/Index'
+import Calculator from './Calculator'
+import Modal from "react-native-modal";
 
 const Details = (props: any) => {
 
@@ -10,6 +12,8 @@ const Details = (props: any) => {
 
     const [title, setTitle] = useState(item?.title || '')
     const [desc, setDesc] = useState(item?.description || '')
+
+    const [showCalculator, setShowCalculator] = useState(false)
 
     const saveToAsync = async () => {
         let obj = {
@@ -26,73 +30,94 @@ const Details = (props: any) => {
         props.setTabs(0)
     }
 
+    const openCalculator = () => setShowCalculator(true)
+    const closeCalculator = () => setShowCalculator(false)
+
     return (
-        <View style={{
-            backgroundColor: '#303134',
-            flex: 1,
-            padding: 10
-        }}>
-
+        <ImageBackground
+            source={require('../assets/bg.jpg')}
+            style={{
+                flex: 1,
+            }}
+            resizeMode="cover">
             <View style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between'
+                flex: 1
             }}>
-                <TouchableOpacity onPress={() => {
-                    props.setTabs(0)
-                }} style={{
-                    paddingBottom: 20
+
+                <View style={{
+                    flexDirection: 'row',
+                    padding: 10,
+                    justifyContent: 'space-between'
                 }}>
-                    <Text style={{
-                        fontSize: 14,
-                        color: 'white'
+                    <TouchableOpacity onPress={() => {
+                        props.setTabs(0)
                     }}>
-                        Back to notes
-                    </Text>
-                </TouchableOpacity>
+                        <Text style={{
+                            fontSize: 14,
+                            color: 'white'
+                        }}>
+                            Back to notes
+                        </Text>
+                    </TouchableOpacity>
 
-                <TouchableOpacity onPress={saveToAsync} style={{
-                    paddingBottom: 20
-                }}>
+                    <TouchableOpacity onPress={saveToAsync}>
+                        <Text style={{
+                            fontSize: 14,
+                            color: 'white',
+                        }}>
+                            Save
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+
+                {/* <TouchableOpacity style={{
+                    backgroundColor: 'white',
+                    borderRadius: 10,
+                    padding: 10
+                }} onPress={openCalculator}>
                     <Text style={{
-                        fontSize: 14,
-                        color: 'white',
+                        color: 'black'
                     }}>
-                        Save
+                        Use Calculator
                     </Text>
-                </TouchableOpacity>
-            </View>
+                </TouchableOpacity> */}
 
-            <TextInput
-                value={title}
-                placeholder='Title'
-                placeholderTextColor={'gray'}
-                style={{
-                    color: 'white',
-                    fontSize: 20
-                }}
-                onChangeText={setTitle} />
-
-            <Text style={{
-                fontSize: 12,
-                color: 'white'
-            }}>
-                {item?.date || ''}
-            </Text>
-
-            <ScrollView>
                 <TextInput
-                    value={desc}
-                    placeholder='notes'
+                    value={title}
+                    placeholder='Title'
                     multiline
                     placeholderTextColor={'gray'}
                     style={{
                         color: 'white',
-                        fontSize: 14
+                        fontSize: 24
                     }}
-                    onChangeText={setDesc} />
-            </ScrollView>
+                    onChangeText={setTitle} />
 
-        </View>
+                <ScrollView>
+                    <TextInput
+                        value={desc}
+                        placeholder='notes'
+                        multiline
+                        placeholderTextColor={'gray'}
+                        style={{
+                            color: 'white',
+                            fontSize: 16
+                        }}
+                        onChangeText={setDesc} />
+                </ScrollView>
+            </View>
+            <Modal
+                isVisible={showCalculator}
+                onBackdropPress={closeCalculator}
+                onSwipeComplete={closeCalculator}
+                style={{
+                    flex: 1
+                }}>
+                <View style={{ flex: 1, justifyContent: 'flex-end' }}>
+                    <Calculator />
+                </View>
+            </Modal>
+        </ImageBackground>
     )
 }
 
